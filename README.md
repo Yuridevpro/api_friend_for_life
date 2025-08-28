@@ -27,7 +27,6 @@ Siga estes passos para configurar e rodar a aplicação e sua API localmente.
 ```bash
 # 1. Clone este repositório
 git clone https://github.com/Yuridevpro/api_friend_for_life.git
-cd api_friend_for_life
 
 # 2. Crie e ative o ambiente virtual
 # No macOS/Linux:
@@ -38,6 +37,8 @@ python -m venv venv
 venv\Scripts\activate
 
 # 3. Instale as dependências do projeto
+entre na pasta do projeto
+cd api_friend_for_life
 Entre na pasta do código-fonte
 cd src
 
