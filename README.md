@@ -38,6 +38,9 @@ python -m venv venv
 venv\Scripts\activate
 
 # 3. Instale as dependências do projeto
+Entre na pasta do código-fonte
+cd src
+
 pip install -r requirements.txt
 ```
 
