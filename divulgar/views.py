@@ -7,6 +7,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
+from rest_framework import generics
+from .models import Pet  # Importa Pet do app local 'divulgar'
+from perfil.models import UserProfile  # Importa UserProfile do app 'perfil'
+from .serializers import PetSerializer 
 
 @login_required
 def novo_pet(request):
@@ -228,3 +232,19 @@ def editar_pet(request, id):
             'choices_tamanho': Pet.choices_tamanho,
         }
         return render(request, 'editar_pet.html', context)
+
+# divulgar/views.py (novas views da API)
+
+class PetListAPIView(generics.ListAPIView):
+    """
+    API endpoint que permite que os pets sejam listados.
+    """
+    queryset = Pet.objects.filter(status='P', is_active=True)
+    serializer_class = PetSerializer
+
+class PetDetailAPIView(generics.RetrieveAPIView):
+    """
+    API endpoint que permite que um único pet seja visualizado.
+    """
+    queryset = Pet.objects.all()
+    serializer_class = PetSerializer

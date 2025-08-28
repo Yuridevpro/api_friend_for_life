@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'perfil',
     'templated_email',
     'pagina_inicio',
+    'rest_framework', 
+    'drf_spectacular',
 ]
 
 # Middleware
@@ -150,3 +152,17 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+# Adicione este bloco no final do arquivo settings.py
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'A Friend for Life API',
+    'DESCRIPTION': 'API para a plataforma de adoção de animais A Friend for Life.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

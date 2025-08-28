@@ -1,0 +1,61 @@
+{
+	"info": {
+		"_postman_id": "e8f1f57a-62d1-4e60-b77a-a8644707cbc1",
+		"name": "API A Friend for Life",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48001779",
+		"_collection_link": "https://yuridev544-1511312.postman.co/workspace/yuri's-Workspace~8adef4c8-744b-4341-85ee-3be410d1d50d/collection/48001779-e8f1f57a-62d1-4e60-b77a-a8644707cbc1?action=share&source=collection_link&creator=48001779"
+	},
+	"item": [
+		{
+			"name": "Listar todos os pets",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/pets/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"pets",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Detalhes de um Pet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/pets/29/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"pets",
+						"29",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
