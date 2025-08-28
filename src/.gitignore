@@ -1,6 +1,6 @@
 # Ambientes Virtuais
 /ambiente_virtual/
-
+/venv/
 
 # Arquivos de Banco de Dados
 *.sqlite3
