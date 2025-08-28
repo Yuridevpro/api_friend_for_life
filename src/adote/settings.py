@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'perfil',
     'pagina_inicio',
     # Apps de Terceiros
-    'templated_email',
+    # 'templated_email',
     'rest_framework',
     'drf_spectacular',
 ]
@@ -51,7 +51,6 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # WhiteNoise pode ser mantido
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
