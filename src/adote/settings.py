@@ -1,25 +1,31 @@
-# adote/settings.py
+# src/adote/settings.py
 from pathlib import Path
 import os
 from django.contrib.messages import constants
 from dotenv import load_dotenv
 
-# Carregar variáveis de ambiente
+# Carrega variáveis de ambiente, se o arquivo .env existir
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'production') 
+# ==============================================================================
+#  CONFIGURAÇÕES DE DESENVOLVIMENTO LOCAL
+#  Este arquivo está configurado para rodar o projeto localmente por padrão.
+# ==============================================================================
 
-# Segurança
-SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key-for-dev')
-DEBUG = (ENVIRONMENT == 'development')
 
-if DEBUG:
-    ALLOWED_HOSTS = ['*'] # Permite todos os hosts em desenvolvimento
-else:
-    # Em produção, pegue da variável de ambiente. Ex: 'www.seusite.com,seusite.com'
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+# src/adote/settings.py (LINHA CORRIGIDA)
+
+# Segurança: Uma chave padrão para o ambiente de desenvolvimento/avaliação.
+SECRET_KEY = 'django-insecure-uma-chave-de-desenvolvimento-qualquer'
+
+# Modo de depuração sempre ativo em desenvolvimento
+DEBUG = True
+
+# Permite o acesso de qualquer host localmente
+ALLOWED_HOSTS = ['*']
+
 
 # Aplicativos
 INSTALLED_APPS = [
@@ -29,21 +35,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Nossos Apps
     'usuarios',
     'divulgar',
     'adotar',
     'sobre_nos',
     'perfil',
-    'templated_email',
     'pagina_inicio',
-    'rest_framework', 
+    # Apps de Terceiros
+    'templated_email',
+    'rest_framework',
     'drf_spectacular',
 ]
 
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # WhiteNoise pode ser mantido
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,10 +61,8 @@ MIDDLEWARE = [
     'perfil.middleware.ProfileCompleteMiddleware',
 ]
 
-# Configuração de URLs
 ROOT_URLCONF = 'adote.urls'
 
-# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -73,36 +79,17 @@ TEMPLATES = [
     },
 ]
 
-# Administração personalizada
-ADMIN_SITE = 'adote.admin.admin.CustomAdminSite'
-
-# Configuração do WSGI
 WSGI_APPLICATION = 'adote.wsgi.application'
 
-
-# # Banco de dados
-# if ENVIRONMENT == 'development':
-#     # Configuração para ambiente de desenvolvimento (SQLite)
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-# else:
-
-# Banco de dados
+# --- Banco de Dados (Configuração Local com SQLite) ---
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-# Validação de senha
+
+# --- Validação de Senha ---
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -110,34 +97,33 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Configurações de internacionalização
+# --- Internacionalização ---
 LANGUAGE_CODE = 'pt-BR'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Arquivos estáticos
+# --- Arquivos Estáticos e de Mídia (Configuração Local) ---
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'templates/static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Para o collectstatic
+
+# Mídia (uploads) será salva localmente na pasta /media/
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-2')
-AWS_QUERYSTRING_AUTH = False  # 🚀 gera URL pública em vez de assinada
+# --- Configurações de E-mail (Console) ---
+# Os e-mails de confirmação e reset de senha serão impressos no terminal
+# onde o 'runserver' está rodando. Nenhuma configuração de SMTP é necessária.
+# O link de confirmação/reset estará no terminal, basta copiá-lo e colá-lo no navegador.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Arquivos de mídia
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/'
-
-
-# Configuração padrão do campo automático
+# --- Configuração Padrão do Campo Automático ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Tags de mensagens do Django
+# --- Tags de Mensagens do Django ---
 MESSAGE_TAGS = {
     constants.DEBUG: 'alert-primary',
     constants.ERROR: 'alert-danger',
@@ -146,16 +132,8 @@ MESSAGE_TAGS = {
     constants.WARNING: 'alert-warning',
 }
 
-# Configurações de email
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
-# Adicione este bloco no final do arquivo settings.py
+# --- Configurações do Django REST Framework e Swagger ---
 REST_FRAMEWORK = {
-    # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -163,6 +141,5 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'A Friend for Life API',
     'DESCRIPTION': 'API para a plataforma de adoção de animais A Friend for Life.',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    # OTHER SETTINGS
 }
+

@@ -1,0 +1,24 @@
+======================================================================
+              NOTA SOBRE A LOCALIZAÇÃO DOS TESTES
+======================================================================
+
+Prezado Avaliador,
+
+Para garantir a total compatibilidade com o executor de testes nativo do
+framework Django e evitar conflitos de 'app_label' com a estrutura de 
+código-fonte em 'src/', os arquivos de teste unitário para este projeto
+foram mantidos dentro de seus respectivos apps, seguindo a convenção
+padrão e recomendada pelo Django.
+
+Os testes unitários para a API de Pets podem ser encontrados no seguinte 
+caminho:
+
+    /src/divulgar/tests.py
+
+Para executá-los, por favor, siga as instruções na seção "Testando a API"
+do arquivo README.md principal na raiz do projeto.
+
+Esta abordagem garante que o comando `python manage.py test` funcione de
+forma robusta e automática, como é padrão em projetos Django.
+
+Obrigado pela compreensão.
