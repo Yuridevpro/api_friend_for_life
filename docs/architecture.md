@@ -24,6 +24,7 @@ graph TD
     end
 
     style B fill:#bbf,stroke:#333,stroke-width:2px
+```
 
 **Fluxo da Requisição da API (Ambiente Local):**
 1.  Um **Cliente da API** (A), como o Postman, envia uma requisição HTTP (ex: `GET /api/pets/`) para o **Servidor de Desenvolvimento Django** (B), que está rodando localmente.
