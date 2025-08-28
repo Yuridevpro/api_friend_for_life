@@ -41,14 +41,9 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-#### c. Variáveis de Ambiente
-```bash
-# 4. Crie o arquivo .env a partir do exemplo fornecido.
-# (Nenhuma edição é necessária para rodar localmente)
-cp .env.example .env
-```
 
-#### d. Banco de Dados e Execução
+
+#### c. Banco de Dados e Execução
 **IMPORTANTE:** Todos os comandos a seguir devem ser executados de dentro da pasta `src/`.
 
 ```bash
