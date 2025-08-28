@@ -2,7 +2,7 @@
 
 ### **Arquivo: `docs/GUIA_DE_USO.md`**
 
-```markdown
+
 # Guia de Uso da Plataforma "A Friend for Life"
 
 Este documento fornece um guia passo a passo sobre como utilizar as principais funcionalidades da plataforma, desde a criação de uma conta até o cadastro de um pet para adoção.
