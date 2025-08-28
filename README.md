@@ -79,7 +79,8 @@ python manage.py test
 **Resultado esperado:** Todos os testes (`3 testes`) devem passar com o status `OK`.
 
 #### b. Verificação Rápida via Navegador
-A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. Com o servidor rodando, use seu navegador para inspecionar os endpoints:
+A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. **Com o servidor rodando**(python manage.py runserver
+), use seu navegador para inspecionar os endpoints:
 
 1.  **Listar todos os pets:**
     *   Acesse: [http://127.0.0.1:8000/api/pets/](http://127.0.0.1:8000/api/pets/)
