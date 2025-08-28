@@ -1,49 +1,157 @@
-# Arquitetura da API - A Friend for Life
+# Projeto de API para Integração de Sistemas (N703)
+## API da Plataforma de Adoção "A Friend for Life"
 
-Este documento descreve a arquitetura da camada de API construída sobre a aplicação web "A Friend for Life", detalhando seus componentes, o fluxo de comunicação e os protocolos utilizados, conforme os requisitos da disciplina de Técnicas de Integração de Sistemas.
+Este repositório contém o código-fonte e a documentação de uma API REST desenvolvida sobre a plataforma "A Friend for Life". O objetivo deste projeto é expor os dados de pets disponíveis para adoção, permitindo a integração com sistemas externos, conforme os requisitos da disciplina.
 
-### 1. Visão Geral da Arquitetura da API
+![Status](https://img.shields.io/badge/Status-API%20Funcional-brightgreen) ![Python](https://img.shields.io/badge/Python-3.x-blue) ![Django](https://img.shields.io/badge/Django-4.x-darkgreen) ![DRF](https://img.shields.io/badge/DRF-3.x-red)
 
-A API foi desenvolvida utilizando o **Django REST Framework (DRF)**, uma extensão robusta e flexível do framework Django. Ela foi projetada para operar sobre a arquitetura monolítica existente da aplicação, adicionando uma camada de serviço que expõe os modelos de dados através de endpoints RESTful.
+### 1. Objetivo do Trabalho
 
-Esta abordagem permite que a lógica de negócios e as regras já implementadas na aplicação principal sejam reutilizadas, garantindo consistência, enquanto se oferece uma interface padronizada para a integração com sistemas externos. A comunicação segue o protocolo **REST/HTTP**, utilizando os métodos HTTP padrão (`GET`) e o formato de dados **JSON** para a serialização.
+O objetivo é desenvolver uma API REST funcional que integre pelo menos dois sistemas distintos. O **Sistema 1** é a aplicação Django, que atua como provedor dos dados. O **Sistema 2** é um cliente de API (neste caso, o Postman), que consome os dados para validação e teste.
 
-### 2. Diagrama da Arquitetura de Integração
+### 2. Descrição Funcional da Solução
 
-O diagrama a seguir ilustra como um sistema externo (Cliente da API) se integra com a aplicação Django através da camada de API.
+A API expõe os dados de animais cadastrados na plataforma, permitindo que aplicações externas listem todos os pets disponíveis para adoção e consultem os detalhes de um pet específico. A comunicação é feita via protocolo HTTP, e os dados são trafegados no formato JSON, seguindo os princípios REST.
 
-```mermaid
-graph TD
-    A["Cliente da API<br>(Postman, Script, App)"] -- HTTP/JSON --> B("Servidor de Desenvolvimento Django");
-    
-    subgraph "Aplicação Django (Sistema 1)"
-        B -- Roteamento --> C["API Views<br>(views.py)"];
-        C -- Busca Dados --> D["Models Django<br>(models.py)"];
-        D -- ORM --> E[("Banco de Dados<br>SQLite")];
-        C -- Serialização --> F["Serializers<br>(serializers.py)"];
-    end
+---
 
-    style B fill:#bbf,stroke:#333,stroke-width:2px
+### 3. Guia de Instalação e Execução
+
+Siga estes passos para configurar e rodar a aplicação e sua API localmente.
+
+#### a. Pré-requisitos
+-   Python 3.x
+-   Git
+
+#### b. Configuração do Ambiente
+```bash
+# 1. Clone este repositório
+git clone https://github.com/Yuridevpro/api_friend_for_life.git
+cd api_friend_for_life
+
+# 2. Crie e ative o ambiente virtual
+# No macOS/Linux:
+python3 -m venv venv
+source venv/bin/activate
+# No Windows:
+python -m venv venv
+venv\Scripts\activate
+
+# 3. Instale as dependências do projeto
+pip install -r requirements.txt
 ```
 
-**Fluxo da Requisição da API (Ambiente Local):**
-1.  Um **Cliente da API** (A), como o Postman, envia uma requisição HTTP (ex: `GET /api/pets/`) para o **Servidor de Desenvolvimento Django** (B), que está rodando localmente.
-2.  O servidor, através do seu roteador de URLs, direciona a requisição para a **API View** (C) correspondente (ex: `PetListAPIView`).
-3.  A API View utiliza os **Models Django** (D) e o ORM para buscar os dados necessários no banco de dados **SQLite** (E).
-4.  Os objetos do Django retornados da consulta são passados para os **Serializers** (F), que os convertem para o formato JSON.
-5.  A API View retorna a resposta em JSON para o Cliente da API (A).
+#### c. Variáveis de Ambiente
+```bash
+# 4. Crie o arquivo .env a partir do exemplo fornecido.
+# (Nenhuma edição é necessária para rodar localmente)
+cp .env.example .env
+```
 
-### 3. Protocolos de Comunicação
+#### d. Banco de Dados e Execução
+**IMPORTANTE:** Todos os comandos a seguir devem ser executados de dentro da pasta `src/`.
 
-*   **Protocolo Principal:** HTTP/1.1 (conforme executado pelo servidor de desenvolvimento do Django).
-*   **Formato de Dados:** JSON.
-*   **Protocolo de Interação:** REST (Representational State Transfer), utilizando verbos HTTP (`GET`) para interagir com os recursos (`/api/pets/`).
+```bash
+# 5. Entre na pasta do código-fonte
+cd src
 
-### 4. Tratamento de Erros
+# 6. Crie o banco de dados SQLite e suas tabelas
+python manage.py migrate
 
-O Django REST Framework fornece um tratamento de erros padronizado e informativo, essencial para a integração de sistemas:
+# 7. Popule o banco de dados com usuários e pets de teste
+python manage.py seed_data
 
-*   **`404 Not Found`:** É retornado quando uma requisição é feita para um recurso específico que não existe (ex: `GET /api/pets/999/` onde o pet com ID 999 não está no banco de dados).
-*   **`400 Bad Request`:** Seria retornado caso a API tivesse endpoints `POST` ou `PUT` e os dados enviados pelo cliente fossem inválidos ou estivessem incompletos.
-*   **`500 Internal Server Error`:** É retornado em caso de falhas inesperadas no servidor durante o processamento da requisição, impedindo que a operação seja concluída.
+# 8. Inicie o servidor de desenvolvimento
+python manage.py runserver
+```
+A aplicação e sua API estarão disponíveis em **http://127.0.0.1:8000**.
+
+---
+
+### 4. Testando a API
+
+#### a. Testes Unitários Automatizados
+Com o ambiente configurado, você pode rodar a suíte de testes unitários.
+
+```bash
+# Certifique-se de que você está dentro da pasta src/
+python manage.py test```
+**Resultado esperado:** Todos os testes (`3 testes`) devem passar com o status `OK`.
+
+#### b. Verificação Rápida via Navegador
+A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. Com o servidor rodando, use seu navegador para inspecionar os endpoints:
+
+1.  **Listar todos os pets:**
+    *   Acesse: [http://127.0.0.1:8000/api/pets/](http://127.0.0.1:8000/api/pets/)
+    *   **Resultado esperado:** Uma página do DRF exibindo uma lista dos pets de teste em formato JSON.
+
+2.  **Ver detalhes de um pet específico:**
+    *   Acesse: [http://127.0.0.1:8000/api/pets/1/](http://127.0.0.1:8000/api/pets/1/)
+    *   **Resultado esperado:** Uma página do DRF exibindo os dados em JSON do pet com `id=1`.
+
+#### c. Teste Completo via Postman/Insomnia
+Para simular um cliente de API externo, utilize a coleção fornecida:
+
+1.  Com o servidor ainda rodando, abra o Postman ou Insomnia.
+2.  Importe a coleção de testes localizada em: `/postman/collection.json`.
+3.  Execute as requisições `Listar todos os pets` e `Obter detalhes de um pet`.
+4.  **Resultado esperado:** Ambas as requisições devem retornar um status `200 OK` com os respectivos dados em JSON.
+
+---
+
+### 5. Documentação das Rotas da API (Swagger/OpenAPI)
+
+A documentação completa e interativa da API, gerada automaticamente, está disponível nos seguintes endpoints enquanto o servidor estiver rodando:
+
+-   **Swagger UI (Recomendado):** [http://127.0.0.1:8000/api/schema/swagger-ui/](http://127.0.0.1:8000/api/schema/swagger-ui/)
+-   **ReDoc:** [http://127.0.0.1:8000/api/schema/redoc/](http://127.0.0.1:8000/api/schema/redoc/)
+
+#### Endpoints Implementados
+| Método | Rota | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/api/pets/` | Retorna uma lista paginada de todos os pets disponíveis para adoção. |
+| `GET` | `/api/pets/{id}/` | Retorna os detalhes de um pet específico pelo seu ID. |
+
+---
+
+### 6. Estrutura do Repositório e Arquivos Relevantes
+
+A estrutura do projeto foi organizada para isolar o código-fonte (`src/`) dos artefatos de teste e documentação, conforme solicitado.
+
+```
+├── 📄 README.md                # Documentação principal e guia de execução
+├── 📂 src/                      # Código-fonte principal da aplicação Django
+│   ├── ⚙️ adote/
+│   │   ├── settings.py        # Configurações do projeto
+│   │   └── urls.py            # Roteador principal de URLs (inclui as rotas da API)
+│   ├── 🐶 divulgar/
+│   │   ├── models.py          # Define o modelo 'Pet'
+│   │   ├── serializers.py     # "Traduz" o modelo 'Pet' para JSON
+│   │   ├── tests.py           # Testes unitários para os endpoints da API
+│   │   └── views.py           # Contém a lógica dos endpoints da API
+│   └── ... (outros apps que fornecem modelos, como 'perfil')
+├── 📂 docs/                     # Documentação adicional
+│   └── architecture.md        # Detalhes da arquitetura da API
+└── 📂 postman/                  # Coleção do Postman para testes manuais
+    └── collection.json        # Arquivo de coleção exportado
+```
+
+#### Descrição dos Arquivos Participantes
+
+*   **`src/adote/settings.py`**: Configuração principal do Django, ajustada para rodar 100% localmente.
+*   **`src/adote/urls.py`**: Roteador principal que define as rotas da API e da documentação Swagger.
+*   **`src/divulgar/models.py`**: Define o modelo `Pet`, a estrutura de dados principal exposta pela API.
+*   **`src/divulgar/serializers.py`**: Contém o `PetSerializer`, responsável por converter os dados do modelo `Pet` para JSON.
+*   **`src/divulgar/views.py`**: Contém as classes `PetListAPIView` e `PetDetailAPIView`, que são a lógica dos endpoints da API.
+*   **`src/divulgar/tests.py`**: Contém os testes unitários automatizados para os endpoints.
+*   **`docs/architecture.md`**: Detalha a arquitetura da camada da API.
+*   **`postman/collection.json`**: Arquivo exportado do Postman com as requisições prontas para testar a API.
+
+---
+
+### 7. Equipe
+- **Nome do Integrante 1:** [Matrícula]
+- **Nome do Integrante 2:** [Matrícula]
+- **Nome do Integrante 3:** [Matrícula]
+- **Nome do Integrante 4:** [Matrícula]
 ```
