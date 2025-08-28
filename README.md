@@ -27,7 +27,6 @@ Siga estes passos para configurar e rodar a aplicação e sua API localmente.
 ```bash
 # 1. Clone este repositório
 git clone https://github.com/Yuridevpro/api_friend_for_life.git
-cd api_friend_for_life
 
 # 2. Crie e ative o ambiente virtual
 # No macOS/Linux:
@@ -38,6 +37,8 @@ python -m venv venv
 venv\Scripts\activate
 
 # 3. Instale as dependências do projeto
+entre na pasta do projeto
+cd api_friend_for_life
 Entre na pasta do código-fonte
 cd src
 
@@ -50,16 +51,14 @@ pip install -r requirements.txt
 **IMPORTANTE:** Todos os comandos a seguir devem ser executados de dentro da pasta `src/`.
 
 ```bash
-# 5. Entre na pasta do código-fonte
-cd src
 
-# 6. Crie as migracoes
+# 4. Crie as migracoes
 python manage.py makemigrations
 
-# 7. Crie o banco de dados SQLite e suas tabelas
+# 5. Crie o banco de dados SQLite e suas tabelas
 python manage.py migrate
 
-# 8. Popule o banco de dados com usuários e pets de teste
+# 6. Popule o banco de dados com usuários e pets de teste
 python manage.py seed_data
 
 # 9. Inicie o servidor de desenvolvimento para testar
@@ -81,7 +80,8 @@ python manage.py test
 **Resultado esperado:** Todos os testes (`3 testes`) devem passar com o status `OK`.
 
 #### b. Verificação Rápida via Navegador
-A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. Com o servidor rodando, use seu navegador para inspecionar os endpoints:
+A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. **Com o servidor rodando**(python manage.py runserver
+), use seu navegador para inspecionar os endpoints:
 
 1.  **Listar todos os pets:**
     *   Acesse: [http://127.0.0.1:8000/api/pets/](http://127.0.0.1:8000/api/pets/)
