@@ -14,17 +14,16 @@ O diagrama a seguir ilustra como um sistema externo (Cliente da API) se integra 
 
 ```mermaid
 graph TD
-    A[Cliente da API<br>(Postman, Script, App)] -- HTTP/JSON --> B(Servidor de Desenvolvimento Django);
+    A["Cliente da API<br>(Postman, Script, App)"] -- HTTP/JSON --> B("Servidor de Desenvolvimento Django");
     
     subgraph "Aplicação Django (Sistema 1)"
-        B -- Roteamento --> C[API Views<br>(views.py)];
-        C -- Busca Dados --> D[Models Django<br>(models.py)];
-        D -- ORM --> E[(Banco de Dados<br>SQLite)];
-        C -- Serialização --> F[Serializers<br>(serializers.py)];
+        B -- Roteamento --> C["API Views<br>(views.py)"];
+        C -- Busca Dados --> D["Models Django<br>(models.py)"];
+        D -- ORM --> E[("Banco de Dados<br>SQLite")];
+        C -- Serialização --> F["Serializers<br>(serializers.py)"];
     end
 
     style B fill:#bbf,stroke:#333,stroke-width:2px
-```
 
 **Fluxo da Requisição da API (Ambiente Local):**
 1.  Um **Cliente da API** (A), como o Postman, envia uma requisição HTTP (ex: `GET /api/pets/`) para o **Servidor de Desenvolvimento Django** (B), que está rodando localmente.
