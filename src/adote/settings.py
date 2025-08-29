@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'sobre_nos',
     'perfil',
     'pagina_inicio',
+    'corsheaders',      
+
     # Apps de Terceiros
     # 'templated_email',
     'rest_framework',
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -142,3 +145,9 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
 }
 
+# (Isso diz ao Django para aceitar requisições do seu servidor local e de arquivos HTML)
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    # "null", # <-- ESSENCIAL para permitir requisições de arquivos 'file://'
+]

@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib import admin
 from .models import Pet, PetImage
+ 
 
 class PetAdminForm(forms.ModelForm):
     cuidados = forms.MultipleChoiceField(

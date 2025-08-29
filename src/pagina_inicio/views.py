@@ -178,5 +178,17 @@ def mais_depoimentos(request):
     else:
         # Se não houver mais depoimentos, retorna um JSON vazio
         return JsonResponse({'depoimentos': []})
+
+# src/pagina_inicio/views.py (ADICIONAR NO FINAL)
+
+# src/pagina_inicio/views.py
+
+def cliente_externo_teste(request):
+    """
+    Renderiza uma página HTML simples que consome a API de pets via JavaScript,
+    simulando um sistema externo.
+    """
+    # Caminho corrigido, com o nome do app na frente
+    return render(request, 'cliente_api_externo.html')
     
     

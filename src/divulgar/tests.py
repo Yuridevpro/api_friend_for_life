@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from .models import Pet
 from perfil.models import UserProfile
 
+
+
 class PetAPITests(APITestCase):
     """
     Suite de testes para a API de Pets.
@@ -91,3 +93,4 @@ class PetAPITests(APITestCase):
         
         # Verifica se a API retorna o erro "Not Found" (status code 404)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
