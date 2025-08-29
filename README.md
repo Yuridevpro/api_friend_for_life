@@ -11,7 +11,11 @@ O objetivo é desenvolver uma API REST funcional que integre pelo menos dois sis
 
 ### 2. Descrição Funcional da Solução
 
-A API expõe os dados de animais cadastrados na plataforma, permitindo que aplicações externas listem todos os pets disponíveis para adoção e consultem os detalhes de um pet específico. A comunicação é feita via protocolo HTTP, e os dados são trafegados no formato JSON, seguindo os princípios REST.
+A API expõe os dados de animais cadastrados na plataforma, permitindo que aplicações externas:
+1.  Listem todos os pets disponíveis para adoção (`GET`).
+2.  Consultem os detalhes de um pet específico (`GET`).
+
+A comunicação é feita via protocolo HTTP, e os dados são trafegados no formato JSON, seguindo os princípios REST.
 
 ---
 
@@ -77,7 +81,7 @@ Com o ambiente configurado, você pode rodar a suíte de testes unitários.
 # Certifique-se de que você está dentro da pasta src/
 python manage.py test
 ```
-**Resultado esperado:** Todos os testes (`3 testes`) devem passar com o status `OK`.
+**Resultado esperado:** Todos os testes (`4 testes`) devem passar com o status `OK`.
 
 #### b. Verificação Rápida via Navegador
 A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. **Com o servidor rodando**(python manage.py runserver
@@ -96,8 +100,17 @@ Para simular um cliente de API externo, utilize a coleção fornecida:
 
 1.  Com o servidor ainda rodando, abra o Postman ou Insomnia.
 2.  Importe a coleção de testes localizada em: `/postman/collection.json`.
-3.  Execute as requisições `Listar todos os pets` e `Obter detalhes de um pet`.
-4.  **Resultado esperado:** Ambas as requisições devem retornar um status `200 OK` com os respectivos dados em JSON.
+3.  Execute as requisições `Listar todos os pets`, `Obter detalhes de um pet` e `Registrar interesse em um pet`.
+4.  **Resultado esperado:** As requisições devem retornar um status `200 OK` para GET e `201 Created`  para POST.
+
+
+#### d. Demonstração Prática da Integração (Site Externo)
+Para validar a integração de ponta a ponta e ver a API em ação, foi criada uma página de demonstração que simula um sistema externo consumindo os dados.
+
+1.  **Certifique-se de que o servidor Django está rodando.** (`python manage.py runserver`)
+2.  **Acesse a seguinte URL no seu navegador:**
+    *   [http://127.0.0.1:8000/pagina_inicio/cliente-externo/](http://127.0.0.1:8000/pagina_inicio/cliente-externo/)
+3.  **Resultado esperado:** Você verá uma página estilizada como o "Site da ONG Parceira", exibindo os cards dos pets que foram carregados dinamicamente através de uma chamada JavaScript à sua API. Ao clicar no botão "Tenho Interesse!", um modal com os contatos do protetor será exibido.
 
 ---
 
@@ -111,8 +124,8 @@ A documentação completa e interativa da API, gerada automaticamente, está dis
 #### Endpoints Implementados
 | Método | Rota | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/api/pets/` | Retorna uma lista paginada de todos os pets disponíveis para adoção. |
-| `GET` | `/api/pets/{id}/` | Retorna os detalhes de um pet específico pelo seu ID. |
+| `GET` | `/api/pets/` | Retorna uma lista de todos os pets ativos e disponíveis para adoção, incluindo um **objeto aninhado com as informações públicas de seu respectivo protetor** (nome, contato). |
+| `GET` | `/api/pets/{id}/` | Retorna os detalhes completos de um pet específico, consultado pelo seu ID, incluindo o **objeto aninhado com os dados do protetor**. |
 
 ---
 
