@@ -15,7 +15,6 @@ A API foi desenvolvida utilizando o **Django REST Framework (DRF)** sobre a apli
 ### 2. Arquitetura em Camadas
 
 O diagrama a seguir apresenta a arquitetura em camadas do sistema, ilustrando a interação entre os componentes internos e os serviços externos consumidos.
-
 ```mermaid
 graph TD
     subgraph "Cliente da API (Sistema Externo)"
@@ -27,32 +26,31 @@ graph TD
         direction LR
         
         subgraph "Camada de Apresentação"
-            A[URLs<br>(urls.py)] --> B[API Views<br>(views.py)];
+            A["URLs<br>(urls.py)"] --> B["API Views<br>(views.py)"];
         end
 
         subgraph "Camada de Negócio"
-            B --> C[Serviços de Integração];
-            C -- "Busca/Valida Dados" --> D[Serializers<br>(serializers.py)];
+            B --> C["Serviços de Integração"];
+            C -- "Busca/Valida Dados" --> D["Serializers<br>(serializers.py)"];
         end
 
         subgraph "Camada de Dados"
-            D -- "Interage com" --> E[Models<br>(models.py)];
+            D -- "Interage com" --> E["Models<br>(models.py)"];
             E -- ORM --> F[("Banco de Dados<br>SQLite")];
-            C -- "Consome" --> G[Cliente HTTP<br>(requests)];
+            C -- "Consome" --> G["Cliente HTTP<br>(requests)"];
         end
     end
 
     subgraph "APIs Externas (Serviços Consumidos)"
         direction LR
-        G --> H[API do IBGE];
-        G --> I[API DiceBear Avatars];
+        G --> H["API do IBGE"];
+        G --> I["API DiceBear Avatars"];
     end
 
     Client -- "Requisição HTTP/JSON" --> A;
 
     style Client fill:#cde,stroke:#333,stroke-width:2px
 ```
-
 ### 3. Explicação da Arquitetura em Camadas
 
 *   **Camada de Apresentação:**
