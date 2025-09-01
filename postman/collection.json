@@ -1,18 +1,18 @@
 {
 	"info": {
-		"_postman_id": "e8f1f57a-62d1-4e60-b77a-a8644707cbc1",
+		"_postman_id": "a1b2c3d4-e5f6-4a7b-8c9d-1e2f3a4b5c6d",
 		"name": "API A Friend for Life (N703)",
-		"description": "Coleção de requisições para testar os endpoints GET da API da plataforma de adoção de animais 'A Friend for Life'.",
+		"description": "Coleção de requisições para testar os endpoints da API de serviços, que consome as APIs externas do IBGE e da DiceBear.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Listar todos os pets",
+			"name": "Listar Estados (Consome IBGE)",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/pets/",
+					"raw": "http://127.0.0.1:8000/api/localidades/estados/",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -23,7 +23,8 @@
 					"port": "8000",
 					"path": [
 						"api",
-						"pets",
+						"localidades",
+						"estados",
 						""
 					]
 				}
@@ -31,12 +32,12 @@
 			"response": []
 		},
 		{
-			"name": "Obter detalhes de um pet",
+			"name": "Listar Cidades de um Estado (Consome IBGE)",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/pets/1/",
+					"raw": "http://127.0.0.1:8000/api/localidades/estados/23/cidades/",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -47,11 +48,40 @@
 					"port": "8000",
 					"path": [
 						"api",
-						"pets",
-						"1",
+						"localidades",
+						"estados",
+						"23",
+						"cidades",
 						""
 					]
-				}
+				},
+				"description": "Este endpoint busca as cidades do estado com ID 23 (Ceará)."
+			},
+			"response": []
+		},
+		{
+			"name": "Gerar Avatar (Consome DiceBear)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/avatar/teste@email.com/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"avatar",
+						"teste@email.com",
+						""
+					]
+				},
+				"description": "Este endpoint gera a URL de um avatar para o e-mail 'teste@email.com', que é o usuário criado pelo comando seed_data."
 			},
 			"response": []
 		}

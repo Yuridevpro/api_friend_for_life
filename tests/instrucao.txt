@@ -2,7 +2,7 @@
               NOTA SOBRE A LOCALIZAÇÃO DOS TESTES
 ======================================================================
 
-Prezado Avaliador,
+
 
 Para garantir a total compatibilidade com o executor de testes nativo do
 framework Django e evitar conflitos de 'app_label' com a estrutura de 
@@ -13,7 +13,7 @@ padrão e recomendada pelo Django.
 Os testes unitários para a API de Pets podem ser encontrados no seguinte 
 caminho:
 
-    /src/divulgar/tests.py
+    /src/usuarios/tests.py
 
 Para executá-los, por favor, siga as instruções na seção "Testando a API"
 do arquivo README.md principal na raiz do projeto.

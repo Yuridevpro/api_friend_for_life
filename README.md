@@ -1,21 +1,23 @@
 # Projeto de API para Integração de Sistemas (N703)
 ## API da Plataforma de Adoção "A Friend for Life"
 
-Este repositório contém o código-fonte e a documentação de uma API REST desenvolvida sobre a plataforma "A Friend for Life". O objetivo deste projeto é expor os dados de pets disponíveis para adoção, permitindo a integração com sistemas externos, conforme os requisitos da disciplina.
+Este repositório contém o código-fonte e a documentação de uma API de serviços desenvolvida para a plataforma "A Friend for Life". O objetivo é demonstrar a criação de uma API própria que atua como um orquestrador, consumindo APIs externas para fornecer funcionalidades enriquecidas.
 
 ![Status](https://img.shields.io/badge/Status-API%20Funcional-brightgreen) ![Python](https://img.shields.io/badge/Python-3.x-blue) ![Django](https://img.shields.io/badge/Django-4.x-darkgreen) ![DRF](https://img.shields.io/badge/DRF-3.x-red)
 
 ### 1. Objetivo do Trabalho
 
-O objetivo é desenvolver uma API REST funcional que integre pelo menos dois sistemas distintos. O **Sistema 1** é a aplicação Django, que atua como provedor dos dados. O **Sistema 2** é um cliente de API (neste caso, o Postman), que consome os dados para validação e teste.
+O objetivo é desenvolver uma API que, para funcionar, consome pelo menos duas APIs externas distintas, demonstrando conceitos de integração e orquestração de serviços.
+-   **API Própria:** Atua como um Backend for Frontend (BFF), oferecendo endpoints de serviço.
+-   **APIs Externas Consumidas:**
+    1.  **IBGE:** Para fornecer dados de geolocalização (estados e cidades).
+    2.  **DiceBear:** Para gerar avatares de perfil únicos.
 
 ### 2. Descrição Funcional da Solução
 
-A API expõe os dados de animais cadastrados na plataforma, permitindo que aplicações externas:
-1.  Listem todos os pets disponíveis para adoção (`GET`).
-2.  Consultem os detalhes de um pet específico (`GET`).
-
-A comunicação é feita via protocolo HTTP, e os dados são trafegados no formato JSON, seguindo os princípios REST.
+A API fornece dois conjuntos de serviços:
+1.  **Serviço de Localidades:** Oferece endpoints que buscam e retornam a lista de estados e cidades do Brasil, consumindo a API do IBGE e adicionando uma camada de cache para otimização.
+2.  **Serviço de Avatares:** Oferece um endpoint que gera uma URL de avatar única com base em um e-mail, consumindo a API da DiceBear.
 
 ---
 
@@ -62,9 +64,6 @@ python manage.py makemigrations
 # 5. Crie o banco de dados SQLite e suas tabelas
 python manage.py migrate
 
-# 6. Popule o banco de dados com usuários e pets de teste
-python manage.py seed_data
-
 # 9. Inicie o servidor de desenvolvimento para testar
 python manage.py runserver
 ```
@@ -72,99 +71,142 @@ A aplicação e sua API estarão disponíveis em **http://127.0.0.1:8000**.
 
 ---
 
-### 4. Testando a API
-
-#### a. Testes Unitários Automatizados
-Com o ambiente configurado, você pode rodar a suíte de testes unitários.
-
-```bash
-# Certifique-se de que você está dentro da pasta src/
-python manage.py test
-```
-**Resultado esperado:** Todos os testes (`4 testes`) devem passar com o status `OK`.
-
-#### b. Verificação Rápida via Navegador
-A API desenvolvida com Django REST Framework oferece uma interface navegável para desenvolvimento. **Com o servidor rodando**(python manage.py runserver
-), use seu navegador para inspecionar os endpoints:
-
-1.  **Listar todos os pets:**
-    *   Acesse: [http://127.0.0.1:8000/api/pets/](http://127.0.0.1:8000/api/pets/)
-    *   **Resultado esperado:** Uma página do DRF exibindo uma lista dos pets de teste em formato JSON.
-
-2.  **Ver detalhes de um pet específico:**
-    *   Acesse: [http://127.0.0.1:8000/api/pets/1/](http://127.0.0.1:8000/api/pets/1/)
-    *   **Resultado esperado:** Uma página do DRF exibindo os dados em JSON do pet com `id=1`.
-
-#### c. Teste Completo via Postman/Insomnia
-Para simular um cliente de API externo, utilize a coleção fornecida:
-
-1.  Com o servidor ainda rodando, abra o Postman ou Insomnia.
-2.  Importe a coleção de testes localizada em: `/postman/collection.json`.
-3.  Execute as requisições `Listar todos os pets`, `Obter detalhes de um pet` e `Registrar interesse em um pet`.
-4.  **Resultado esperado:** As requisições devem retornar um status `200 OK` para GET e `201 Created`  para POST.
+### 4. Guia de Criacao do usuario
 
 
-#### d. Demonstração Prática da Integração (Site Externo)
-Para validar a integração de ponta a ponta e ver a API em ação, foi criada uma página de demonstração que simula um sistema externo consumindo os dados.
+#### **Opção 1: Cadastro Manual (Recomendado para Testar a Aplicação Web)**
 
-1.  **Certifique-se de que o servidor Django está rodando.** (`python manage.py runserver`)
-2.  **Acesse a seguinte URL no seu navegador:**
-    *   [http://127.0.0.1:8000/pagina_inicio/cliente-externo/](http://127.0.0.1:8000/pagina_inicio/cliente-externo/)
-3.  **Resultado esperado:** Você verá uma página estilizada como o "Site da ONG Parceira", exibindo os cards dos pets que foram carregados dinamicamente através de uma chamada JavaScript à sua API. Ao clicar no botão "Tenho Interesse!", um modal com os contatos do protetor será exibido.
+Se você deseja testar a experiência completa da aplicação web (cadastro, login, etc.), siga o guia de uso detalhado.
+
+1.  **Inicie o servidor:**
+    ```bash
+    python manage.py runserver
+    ```
+2.  **Siga o Guia de Uso:** Acesse o documento [`/docs/GUIA_DE_USO.md`](./docs/GUIA_DE_USO.md) para um passo a passo detalhado sobre como criar uma conta, ativar via terminal e usar todas as funcionalidades do site.
 
 ---
 
-### 5. Documentação das Rotas da API (Swagger/OpenAPI)
+#### **Opção 2: Criação Automática de Usuário (Recomendado para Testar a API Rapidamente)**
 
-A documentação completa e interativa da API, gerada automaticamente, está disponível nos seguintes endpoints enquanto o servidor estiver rodando:
+Se o seu objetivo é apenas validar rapidamente os endpoints da API com o Postman ou no navegador, use este comando para criar um usuário de teste instantaneamente.
 
--   **Swagger UI (Recomendado):** [http://127.0.0.1:8000/api/schema/swagger-ui/](http://127.0.0.1:8000/api/schema/swagger-ui/)
--   **ReDoc:** [http://127.0.0.1:8000/api/schema/redoc/](http://127.0.0.1:8000/api/schema/redoc/)
+1.  **Execute o comando de seed (ainda dentro da pasta `src/`):**
+    ```bash
+    python manage.py seed_data
+    ```
+2.  **Inicie o servidor:**
+    ```bash
+    python manage.py runserver
+    ```
+*   Este comando cria o usuário de teste `teste@email.com`, que pode ser usado para testar o endpoint da API de avatares.
+
+---
+
+
+
+### 5. Testando a API
+
+#### a. Testes Unitários Automatizados
+```bash
+# Na pasta src/, execute:
+python manage.py test
+```
+**Resultado esperado:** Todos os testes devem passar com `OK`.
+
+#### b. Teste Manual via Navegador
+Com o servidor rodando, você pode verificar os endpoints no navegador:
+
+1.  **Listar todos os estados:**
+    *   Acesse: [http://127.0.0.1:8000/api/localidades/estados/](http://127.0.0.1:8000/api/localidades/estados/)
+
+2.  **Gerar um avatar:**
+    *   Acesse: [http://127.0.0.1:8000/api/avatar/exemplo@email.com/](http://127.0.0.1:8000/api/avatar/exemplo@email.com/)
+
+#### c. Teste Completo via Postman/Insomnia
+Para simular um cliente de API externo e validar os endpoints de forma mais robusta, utilize a coleção fornecida.
+
+1.  Com o servidor ainda rodando, abra o Postman ou Insomnia.
+2.  Importe a coleção de testes localizada em: `/postman/collection.json`.
+3.  A coleção conterá requisições pré-configuradas para todos os endpoints, como `Listar Estados`, `Listar Cidades de um Estado` e `Gerar Avatar`.
+4.  Execute as requisições para verificar o funcionamento. A resposta esperada é um status `200 OK` com os respectivos dados em JSON.
+
+
+---
+
+### 6. Documentação das Rotas da API (Swagger/OpenAPI)
+
+A documentação interativa da API está disponível no seguinte endpoint:
+
+-   **Swagger UI:** [http://127.0.0.1:8000/api/schema/swagger-ui/](http://127.0.0.1:8000/api/schema/swagger-ui/)
 
 #### Endpoints Implementados
 | Método | Rota | Descrição |
 | :--- | :--- | :--- |
-| `GET` | `/api/pets/` | Retorna uma lista de todos os pets ativos e disponíveis para adoção, incluindo um **objeto aninhado com as informações públicas de seu respectivo protetor** (nome, contato). |
-| `GET` | `/api/pets/{id}/` | Retorna os detalhes completos de um pet específico, consultado pelo seu ID, incluindo o **objeto aninhado com os dados do protetor**. |
+| `GET` | `/api/localidades/estados/` | Retorna a lista de estados do Brasil (consome IBGE). |
+| `GET` | `/api/localidades/estados/{id}/cidades/` | Retorna a lista de cidades de um estado (consome IBGE).|
+| `GET` | `/api/avatar/{email}/` | Retorna a URL de um avatar gerado (consome DiceBear). |
 
 ---
 
-### 6. Estrutura do Repositório e Arquivos Relevantes
+### 7. Estrutura do Repositório e Arquivos Relevantes
 
-A estrutura do projeto foi organizada para isolar o código-fonte (`src/`) dos artefatos de teste e documentação, conforme solicitado.
+A estrutura do projeto foi organizada para isolar o código-fonte (`src/`) dos artefatos de teste e documentação, conforme solicitado na proposta de trabalho.
 
 ```
-├── 📄 README.md                # Documentação principal e guia de execução
+/
+├── 📄 README.md                # Guia principal com instruções de execução
+├── 📜 requirements.txt         # Lista de dependências Python
+├── 🔑 .env.example              # Modelo para o arquivo de variáveis de ambiente
 ├── 📂 src/                      # Código-fonte principal da aplicação Django
 │   ├── ⚙️ adote/
 │   │   ├── settings.py        # Configurações do projeto
-│   │   └── urls.py            # Roteador principal de URLs (inclui as rotas da API)
-│   ├── 🐶 divulgar/
-│   │   ├── models.py          # Define o modelo 'Pet'
-│   │   ├── serializers.py     # "Traduz" o modelo 'Pet' para JSON
-│   │   ├── tests.py           # Testes unitários para os endpoints da API
-│   │   └── views.py           # Contém a lógica dos endpoints da API
-│   └── ... (outros apps que fornecem modelos, como 'perfil')
-├── 📂 docs/                     # Documentação adicional
-│   └── architecture.md        # Detalhes da arquitetura da API
-└── 📂 postman/                  # Coleção do Postman para testes manuais
-    └── collection.json        # Arquivo de coleção exportado
+│   │   └── urls.py            # Roteador principal de URLs (incluindo as rotas da API)
+│   ├── 👤 perfil/
+│   │   └── views.py           # Contém a view da API de Avatares
+│   └── 📱 usuarios/
+│   │   │   📂management/
+│   │   │    └── commands/
+│   │   │        └── seed_data.py # Script para popular o banco de dados
+│   │   ├── tests.py  # Contém os testes unitários da API
+│   │   └── views.py  # Contém as views da API de Localidades
+├── 📂 docs/  # Documentação adicional
+│   ├── 📄 architecture.md  # Detalhes da arquitetura da API
+│   └── 📄 GUIA_DE_USO.md   # Guia para teste manual da aplicação web
+├── 📂 tests/   # Pasta de testes (conforme solicitado)
+│   └── 📄 instrucao.txt  # Nota explicando a localização dos testes
+└── 📂 postman/ # Coleção do Postman para testes manuais
+    └── 📄 collection.json  # Arquivo de coleção exportado
 ```
 
-#### Descrição dos Arquivos Participantes
+#### 8. Descrição dos Arquivos Participantes
 
-*   **`src/adote/settings.py`**: Configuração principal do Django, ajustada para rodar 100% localmente.
-*   **`src/adote/urls.py`**: Roteador principal que define as rotas da API e da documentação Swagger.
-*   **`src/divulgar/models.py`**: Define o modelo `Pet`, a estrutura de dados principal exposta pela API.
-*   **`src/divulgar/serializers.py`**: Contém o `PetSerializer`, responsável por converter os dados do modelo `Pet` para JSON.
-*   **`src/divulgar/views.py`**: Contém as classes `PetListAPIView` e `PetDetailAPIView`, que são a lógica dos endpoints da API.
-*   **`src/divulgar/tests.py`**: Contém os testes unitários automatizados para os endpoints.
-*   **`docs/architecture.md`**: Detalha a arquitetura da camada da API.
-*   **`postman/collection.json`**: Arquivo exportado do Postman com as requisições prontas para testar a API.
+*   **`src/adote/urls.py`**
+    *   **Descrição:** Roteador de URLs principal do projeto. É aqui que são definidas as rotas para as APIs que criamos (`/api/localidades/` e `/api/avatar/`) e também as rotas para a documentação interativa (Swagger UI).
+
+*   **`src/usuarios/mannagement/commands/seed_data.py`**
+    *   **Descrição:** Comando de gerenciamento customizado do Django. Sua função é popular o banco de dados com um usuário de teste, facilitando a avaliação da API e da aplicação web.
+
+*   **`src/perfil/models.py`**
+    *   **Descrição:** Contém o modelo `UserProfile`, que foi aprimorado com o método `get_avatar()` para consumir a API da DiceBear e gerar uma URL de avatar.
+
+*   **`src/perfil/views.py`**
+    *   **Descrição:** Contém a view `AvatarAPIView`, que implementa o endpoint `/api/avatar/<email>/` e consome a API da DiceBear.
+
+*   **`src/usuarios/views.py`**
+    *   **Descrição:** Contém as views `EstadoListAPIView` e `CidadeListAPIView`, que implementam os endpoints `/api/localidades/...` e consomem a API do IBGE, adicionando uma camada de cache.
+
+*   **`src/usuarios/tests.py`**
+    *   **Descrição:** Contém os testes unitários automatizados para os endpoints da API (`/api/localidades/` e `/api/avatar/`), garantindo seu funcionamento correto e tratando casos de sucesso e erro.
+
+*   **`docs/architecture.md`**
+    *   **Descrição:** Documento técnico que detalha a arquitetura da camada da API, com um diagrama de fluxo e a explicação dos componentes e protocolos de comunicação.
+
+*   **`postman/collection.json`**
+    *   **Descrição:** Arquivo de coleção exportado do Postman. Contém requisições pré-configuradas para todos os endpoints da API, permitindo que o avaliador teste a integração de forma rápida e padronizada.
 
 ---
 
-### 7. Equipe
+### 9. Equipe
 - **Nome do Integrante 1:** [Matrícula]
 - **Nome do Integrante 2:** [Matrícula]
 - **Nome do Integrante 3:** [Matrícula]
