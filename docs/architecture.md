@@ -19,7 +19,7 @@ O diagrama a seguir apresenta a arquitetura em camadas do sistema, ilustrando a 
 graph TD
     subgraph "Cliente da API (Sistema Externo)"
         direction LR
-        Client["Postman / Browser<br>(cliente_api_externo.html)"]
+        Client["Postman / Browser<br>"]
     end
 
     subgraph "API 'A Friend for Life' (Sistema Principal)"
