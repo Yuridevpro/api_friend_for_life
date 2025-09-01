@@ -35,11 +35,8 @@
         <!-- Informações do perfil do usuário -->
         <div class="profile-info">
             <div class="profile-picture">
-                {% if user.userprofile.foto_perfil %}
-                    <img src="{{ user.userprofile.foto_perfil.url }}" alt="Foto de perfil">
-                {% else %}
-                    <img src="{% static 'perfil/meu_perfil/img/default_profile_picture.png' %}" alt="Foto de perfil">
-                {% endif %}
+                <img id="avatar-desktop" src="{{ request.user.userprofile.get_avatar }}" alt="Foto de perfil">      
+
             </div>
             <div class="content">
                 <h1 style="text-transform: uppercase;">{{ user.userprofile.nome }} {{ user.userprofile.sobrenome }}</h1>

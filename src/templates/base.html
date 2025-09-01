@@ -67,11 +67,7 @@
                     border-radius: 50%;
                     background-color: #000000; 
                     overflow: hidden;">
-                    {% if request.user.userprofile.foto_perfil %}
-                    <img src="{{ request.user.userprofile.foto_perfil.url }}" alt="Foto de perfil" style="width: 100%; height: auto;">
-                    {% else %}
-                    <img src="{% static 'perfil/meu_perfil/img/default_profile_picture.png' %}" alt="Foto de perfil" style="width: 100%; height: auto;">
-                    {% endif %}
+            <img id="avatar-desktop" src="{{ request.user.userprofile.get_avatar }}" alt="Foto de perfil">      
                 </div>
             </a>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">

@@ -1,96 +1,58 @@
-
-# divulgar/tests.py
+# src/usuarios/tests.py
 
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
-from .models import Pet
-from perfil.models import UserProfile
+from unittest.mock import patch # Importa a biblioteca de 'mocking'
 
-
-
-class PetAPITests(APITestCase):
+class LocalidadesAPITests(APITestCase):
     """
-    Suite de testes para a API de Pets.
+    Suite de testes para a API de Localidades.
     """
-    @classmethod
-    def setUpTestData(cls):
+    def test_list_estados_endpoint(self):
         """
-        Configura os dados iniciais que serão usados em todos os testes desta classe.
-        É executado apenas uma vez.
+        Testa o endpoint de listagem de estados (GET /api/localidades/estados/).
         """
-        # 1. Criar um usuário de teste
-        cls.user = User.objects.create_user(username='testuser', password='testpassword123')
+        url = reverse('api_estado_list')
+        response = self.client.get(url)
         
-        # 2. Criar um perfil para o usuário de teste
-        UserProfile.objects.create(
-            user=cls.user,
-            nome='Test',
-            sobrenome='User',
-            telefone='123456789',
-            estado_nome='Ceará',
-            cidade_nome='Fortaleza',
-            email='test@example.com'
-        )
-        
-        # 3. Criar um pet de teste associado a esse usuário
-        cls.pet = Pet.objects.create(
-            usuario=cls.user,
-            nome_pet='Rex',
-            especie='Cachorro',
-            sexo='Macho',
-            tamanho='Médio',
-            status='P', # Para Adoção
-            is_active=True
-        )
-
-    def test_list_pets_endpoint(self):
-        """
-        Teste para o endpoint de listagem de pets (GET /api/pets/).
-        """
-        # Monta a URL para o endpoint de listagem
-        url = reverse('api_pet_list')
-        
-        # Faz uma requisição GET para a URL
-        response = self.client.get(url, format='json')
-        
-        # 1. Verifica se a requisição foi bem-sucedida (status code 200 OK)
+        # Verifica se a requisição foi bem-sucedida (status 200 OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-        # 2. Verifica se a resposta contém 1 resultado (o pet que criamos)
-        self.assertEqual(len(response.data), 1)
-        
-        # 3. Verifica se o nome do pet na resposta está correto
-        self.assertEqual(response.data[0]['nome_pet'], 'Rex')
+        # Verifica se a resposta contém dados (não está vazia)
+        self.assertTrue(len(response.data) > 0)
+        # Verifica se a resposta contém um estado conhecido (ex: Ceará)
+        nomes_dos_estados = [estado['nome'] for estado in response.data]
+        self.assertIn('Ceará', nomes_dos_estados)
 
-    def test_detail_pet_endpoint(self):
+    def test_list_cidades_endpoint(self):
         """
-        Teste para o endpoint de detalhes de um pet (GET /api/pets/<id>/).
+        Testa o endpoint de listagem de cidades (GET /api/localidades/estados/<id>/cidades/).
         """
-        # Monta a URL para o endpoint de detalhes, usando o ID do pet que criamos
-        url = reverse('api_pet_detail', kwargs={'pk': self.pet.pk})
+        estado_id_ceara = 23 # ID do Ceará na API do IBGE
+        url = reverse('api_cidade_list', kwargs={'estado_id': estado_id_ceara})
+        response = self.client.get(url)
         
-        # Faz uma requisição GET para a URL
-        response = self.client.get(url, format='json')
-        
-        # 1. Verifica se a requisição foi bem-sucedida (status code 200 OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-        # 2. Verifica se os dados retornados são do pet correto
-        self.assertEqual(response.data['nome_pet'], self.pet.nome_pet)
-        self.assertEqual(response.data['especie'], 'Cachorro')
+        self.assertTrue(len(response.data) > 0)
+        # Verifica se a resposta contém uma cidade conhecida (ex: Fortaleza)
+        nomes_das_cidades = [cidade['nome'] for cidade in response.data]
+        self.assertIn('Fortaleza', nomes_das_cidades)
 
-    def test_detail_pet_not_found(self):
+class AvatarAPITests(APITestCase):
+    """
+    Suite de testes para a API de Avatares.
+    """
+    def test_get_avatar_endpoint(self):
         """
-        Teste para o caso de um pet que não existe.
+        Testa o endpoint de geração de avatar (GET /api/avatar/<email>/).
         """
-        # Monta uma URL para um ID de pet que não existe (ex: 999)
-        url = reverse('api_pet_detail', kwargs={'pk': 999})
+        email_teste = "teste@exemplo.com"
+        url = reverse('api_avatar', kwargs={'email': email_teste})
+        response = self.client.get(url)
         
-        # Faz uma requisição GET
-        response = self.client.get(url, format='json')
-        
-        # Verifica se a API retorna o erro "Not Found" (status code 404)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Verifica se a resposta contém a chave 'avatar_url'
+        self.assertIn('avatar_url', response.data)
+        # Verifica se a URL retornada contém a base da API e o e-mail
+        self.assertIn('api.dicebear.com', response.data['avatar_url'])
+        self.assertIn(email_teste, response.data['avatar_url'])

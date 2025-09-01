@@ -202,70 +202,91 @@
   <!-- end wrapper -->
 
   <script>
+    // ========================================================== //
+    //    SCRIPT PARA CARREGAMENTO DINÂMICO DE ESTADOS E CIDADES   //
+    // ========================================================== //
     $(document).ready(function() {
-      $.ajax({
-        url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados',
-        type: 'GET',
-        dataType: 'json',
-        success: function(estados) {
-          var selectEstado = $('#estado');
-          estados.sort(function(a, b) {
-            return a.nome.localeCompare(b.nome);
-          });
-          $.each(estados, function(index, estado) {
-            selectEstado.append('<option value="' + estado.id + '">' + estado.nome + '</option>');
-          });
-          selectEstado.change();
-        }
-      });
-
-      $('#estado').change(function() {
-        var estadoId = $(this).val();
-        var selectCidade = $('#cidade');
-        selectCidade.empty();
-        selectCidade.append('<option value="">Todas as Cidades</option>');
-        if (estadoId) {
-          $.ajax({
-            url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoId + '/municipios',
+        // --- LÓGICA DE LOCALIZAÇÃO ATUALIZADA ---
+        // Agora, a URL aponta para a SUA API
+        $.ajax({
+            url: '/api/localidades/estados/', // <-- MUDANÇA AQUI
             type: 'GET',
             dataType: 'json',
-            success: function(cidades) {
-              cidades.sort(function(a, b) {
-                return a.nome.localeCompare(b.nome);
-              });
-              $.each(cidades, function(index, cidade) {
-                selectCidade.append('<option value="' + cidade.nome + '">' + cidade.nome + '</option>');
-              });
+            success: function(estados) {
+                var selectEstado = $('#estado');
+                // A lógica de ordenação e preenchimento continua a mesma
+                estados.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
+                $.each(estados, function(index, estado) {
+                    selectEstado.append('<option value="' + estado.id + '">' + estado.nome + '</option>');
+                });
+            },
+            error: function() {
+                console.error("Falha ao carregar a lista de estados da API local.");
             }
-          });
-        }
-      });
+        });
 
-      $('.alert').delay(2500).slideUp(400);
+        $('#estado').change(function() {
+            var estadoId = $(this).val();
+            var selectCidade = $('#cidade');
+            selectCidade.empty().append('<option value="">Todas as Cidades</option>');
+            if (estadoId) {
+                // Agora, a URL aponta para a SUA API
+                $.ajax({
+                    url: `/api/localidades/estados/${estadoId}/cidades/`, // <-- MUDANÇA AQUI
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(cidades) {
+                        cidades.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
+                        $.each(cidades, function(index, cidade) {
+                            // No filtro, o 'value' deve ser o nome da cidade para a view de filtro funcionar
+                            selectCidade.append('<option value="' + cidade.nome + '">' + cidade.nome + '</option>');
+                        });
+                    },
+                    error: function() {
+                        console.error("Falha ao carregar a lista de cidades da API local.");
+                    }
+                });
+            }
+        });
+        // --- FIM DA LÓGICA DE LOCALIZAÇÃO ---
     });
 
-    let paginaAtualDepoimentos = 1; // Inicializa a página atual com 1
+    // ========================================================== //
+    //       SCRIPT PARA CARREGAMENTO DE MAIS DEPOIMENTOS         //
+    // ========================================================== //
+    let paginaAtualDepoimentos = 1;
 
-    function carregarMaisDepoimentos() {
-      $.ajax({
-        url: "{% url 'mais_depoimentos' %}?pagina_atual=" + paginaAtualDepoimentos, // Passa a página atual
-        type: 'GET',
-        success: function(data) {
-          if (data.depoimentos.length > 0) {
-            $.each(data.depoimentos, function(index, depoimento) {
-              $('#depoimentos-container').append(`
-                <div class="testimonial">
-                  <p>"${depoimento.mensagem}"</p>
-                  <h4>-  ${depoimento.nome} ${depoimento.sobrenome}</h4>
-                </div>
-              `);
-            });
-            paginaAtualDepoimentos++; // Incrementa a página atual
-          } else {
-            $('#maisDepoimentos').html('<p>Não há mais depoimentos.</p>');
-          }
-        }
-      });
+    // A função é declarada no escopo global (window) para ser acessível pelo 'onclick'
+    window.carregarMaisDepoimentos = function() {
+        $.ajax({
+            url: "{% url 'mais_depoimentos' %}?pagina_atual=" + paginaAtualDepoimentos,
+            type: 'GET',
+            success: function(data) {
+                if (data.depoimentos && data.depoimentos.length > 0) {
+                    $.each(data.depoimentos, function(index, depoimento) {
+                        $('#depoimentos-container').append(`
+                            <div class="testimonial">
+                                <p>"${depoimento.mensagem}"</p>
+                                <h4>- ${depoimento.nome} ${depoimento.sobrenome}</h4>
+                            </div>
+                        `);
+                    });
+                    paginaAtualDepoimentos++;
+                } else {
+                    $('#maisDepoimentos').html('<p>Não há mais depoimentos.</p>');
+                }
+            },
+            error: function() {
+                $('#maisDepoimentos').html('<p>Ocorreu um erro ao carregar os depoimentos.</p>');
+            }
+        });
     }
-  </script>
+
+    // ========================================================== //
+    //         SCRIPT PARA MENSAGENS DE FEEDBACK (Alerts)         //
+    // ========================================================== //
+    $(document).ready(function() {
+        $('.alert').delay(3000).slideUp(400); // Aumentado para 3 segundos
+    });
+</script>
 {% endblock %}

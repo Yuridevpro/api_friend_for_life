@@ -10,8 +10,7 @@ urlpatterns = [
     path('mais_depoimentos/', views.mais_depoimentos, name='mais_depoimentos'),  # Adicione esta rota
     path('', views.home, name='home'),  # adicione a URL desejada
       
-    # --- NOVA ROTA PARA O CLIENTE DE TESTE DA API ---
-    path('cliente-externo/', views.cliente_externo_teste, name='cliente_externo'),
+    
     
 ]
 

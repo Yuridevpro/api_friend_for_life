@@ -222,45 +222,52 @@
 
     <script>
         $(document).ready(function() {
+            // --- LÓGICA DE LOCALIZAÇÃO ATUALIZADA ---
+            // Agora, a URL aponta para a SUA API
             $.ajax({
-                url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados',
+                url: '/api/localidades/estados/', // <-- MUDANÇA AQUI
                 type: 'GET',
                 dataType: 'json',
                 success: function(estados) {
                     var selectEstado = $('#estado');
-                    estados.sort(function(a, b) {
-                        return a.nome.localeCompare(b.nome);
-                    });
+                    // A lógica de ordenação e preenchimento continua a mesma
+                    estados.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
                     $.each(estados, function(index, estado) {
                         selectEstado.append('<option value="' + estado.id + '">' + estado.nome + '</option>');
                     });
-                    selectEstado.change();
+                },
+                error: function() {
+                    console.error("Falha ao carregar a lista de estados da API local.");
                 }
             });
-
+    
             $('#estado').change(function() {
                 var estadoId = $(this).val();
                 var selectCidade = $('#cidade');
-                selectCidade.empty();
-                selectCidade.append('<option value="">Todas as Cidades</option>');
+                selectCidade.empty().append('<option value="">Todas as Cidades</option>');
                 if (estadoId) {
+                    // Agora, a URL aponta para a SUA API
                     $.ajax({
-                        url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoId + '/municipios',
+                        url: `/api/localidades/estados/${estadoId}/cidades/`, // <-- MUDANÇA AQUI
                         type: 'GET',
                         dataType: 'json',
                         success: function(cidades) {
-                            cidades.sort(function(a, b) {
-                                return a.nome.localeCompare(b.nome);
-                            });
+                            cidades.sort(function(a, b) { return a.nome.localeCompare(b.nome); });
                             $.each(cidades, function(index, cidade) {
+                                // No filtro, o 'value' deve ser o nome da cidade para a view de filtro funcionar
                                 selectCidade.append('<option value="' + cidade.nome + '">' + cidade.nome + '</option>');
                             });
+    },
+                        error: function() {
+                            console.error("Falha ao carregar a lista de cidades da API local.");
                         }
                     });
                 }
             });
-
-            $('.alert').delay(2500).slideUp(400);
+            // --- FIM DA LÓGICA DE LOCALIZAÇÃO ---
+    
+            // Lógica para as mensagens de alerta
+            $('.alert').delay(3000).slideUp(400);
         });
     </script>
 

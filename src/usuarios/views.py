@@ -21,7 +21,11 @@ from .models import Ativacao, ResetSenha
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
-
+import requests
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.cache import cache 
 
 def cadastro(request):
     if request.user.is_authenticated:
@@ -319,3 +323,41 @@ def criar_senha(request, uidb64, token):
         # Mensagem de erro para link inválido ou expirado
         messages.add_message(request, constants.ERROR, 'Link de redefinição de senha inválido ou expirado.')
         return redirect('/auth/login')
+
+
+# Views para cidade e estados
+
+class EstadoListAPIView(APIView):
+    """
+    API endpoint que busca a lista de estados da API do IBGE e a armazena em cache.
+    """
+    def get(self, request, format=None):
+        # Tenta buscar do cache primeiro
+        estados_cache = cache.get('lista_estados_ibge')
+        if estados_cache:
+            return Response(estados_cache)
+
+        try:
+            response = requests.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+            response.raise_for_status()
+            estados = response.json()
+            
+            # Salva no cache por 24 horas (86400 segundos)
+            cache.set('lista_estados_ibge', estados, timeout=86400)
+            
+            return Response(estados, status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({'error': 'Falha ao buscar dados do IBGE.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CidadeListAPIView(APIView):
+    """
+    API endpoint que busca a lista de cidades de um estado específico na API do IBGE.
+    """
+    def get(self, request, estado_id, format=None):
+        try:
+            response = requests.get(f'https://servicodados.ibge.gov.br/api/v1/localidades/estados/{estado_id}/municipios?orderBy=nome')
+            response.raise_for_status()
+            cidades = response.json()
+            return Response(cidades, status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({'error': 'Falha ao buscar dados do IBGE.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

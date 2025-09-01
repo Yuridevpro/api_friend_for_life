@@ -16,7 +16,10 @@ from django.shortcuts import get_object_or_404
 from divulgar.models import Pet
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import update_session_auth_hash
-
+# Adicione estas importações no topo, se não existirem
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 @login_required
 def meu_perfil(request):
@@ -354,5 +357,40 @@ def remover_conta(request):
 def sair(request):
     logout(request)
     return redirect('/auth/login')
+
+
+
+
+
+
+class AvatarAPIView(APIView):
+    """
+    API endpoint que consome a API DiceBear para gerar uma URL de avatar
+    com base em um e-mail fornecido.
+    """
+    def get(self, request, email, format=None):
+        try:
+            # Validação inicial para garantir que o e-mail não está vazio
+            if not email:
+                return Response(
+                    {"error": "O e-mail é obrigatório."}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # --- Consumo da API Externa (DiceBear) ---
+            # A "chamada" aqui é apenas a construção da URL, que é inerentemente segura
+            # e não deve lançar exceções de rede.
+            avatar_url = f"https://api.dicebear.com/8.x/adventurer/svg?seed={email}"
+            
+            # Retorna a URL em um objeto JSON
+            return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            # Rede de segurança para qualquer erro inesperado que possa ocorrer
+            # durante o processamento da requisição.
+            return Response(
+                {"detail": "Ocorreu um erro inesperado no servidor ao gerar o avatar."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 

@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.utils.html import format_html
 
+# NÃO PRECISA importar 'serializers' aqui
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -15,5 +15,17 @@ class UserProfile(models.Model):
     email = models.EmailField(max_length=100)
     foto_perfil = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
+    # A CLASSE META E O CAMPO 'avatar_url' NÃO PERTENCEM AO MODELO.
+    # Eles foram removidos.
+
     def __str__(self):
         return f"{self.nome} {self.sobrenome}"
+
+    # O MÉTODO PARA GERAR A URL DO AVATAR FICA AQUI, NO MODELO.
+    def get_avatar(self):
+        if self.foto_perfil and hasattr(self.foto_perfil, 'url'):
+            return self.foto_perfil.url
+        # Gera um avatar único usando o email como 'seed'
+        return f"https://api.dicebear.com/8.x/adventurer/svg?seed={self.email}"
+
+   

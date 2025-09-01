@@ -1,12 +1,15 @@
+# src/adote/urls.py
+
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
+from usuarios.views import EstadoListAPIView, CidadeListAPIView
 
-# Importações para a API e Documentação
-from divulgar.views import PetListAPIView, PetDetailAPIView
+# --- IMPORTAÇÃO COMPLETA DAS VIEWS DA API ---
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from perfil.views import AvatarAPIView
 
 urlpatterns = [
     # URLs da Aplicação Web
@@ -17,16 +20,17 @@ urlpatterns = [
     path('perfil/', include('perfil.urls')),
     path('sobre_nos/', include('sobre_nos.urls')),
     path('pagina_inicio/', include('pagina_inicio.urls')),
-    path('', RedirectView.as_view(url='/pagina_inicio/', permanent=False)),  # Redireciona a raiz para a página inicial
+    path('', RedirectView.as_view(url='/pagina_inicio/', permanent=False)),
 
-    # --- URLs DA API REST ---
-    path('api/pets/', PetListAPIView.as_view(), name='api_pet_list'),
-    path('api/pets/<int:pk>/', PetDetailAPIView.as_view(), name='api_pet_detail'),
-    
     # --- URLs DA DOCUMENTAÇÃO DA API (SWAGGER/OPENAPI) ---
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    path('api/localidades/estados/', EstadoListAPIView.as_view(), name='api_estado_list'),
+    path('api/localidades/estados/<int:estado_id>/cidades/', CidadeListAPIView.as_view(), name='api_cidade_list'),
+    path('api/avatar/<str:email>/', AvatarAPIView.as_view(), name='api_avatar'),
+
 ]
 
 # Configuração para servir arquivos de mídia em ambiente de desenvolvimento

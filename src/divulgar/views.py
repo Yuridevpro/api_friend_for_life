@@ -10,11 +10,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework import generics
 from .models import Pet  # Importa Pet do app local 'divulgar'
 from perfil.models import UserProfile  # Importa UserProfile do app 'perfil'
-from .serializers import PetSerializer 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-
 
 @login_required
 def novo_pet(request):
@@ -151,7 +146,7 @@ def editar_pet(request, id):
         novas_fotos_secundarias = request.FILES.getlist('fotos_secundarias')
         ids_fotos_remover = request.POST.getlist('remover_fotos_secundarias')
 
-       
+
         errors = []
         if not nome_pet: errors.append('Nome do Pet é obrigatório.')
         if not historia_pet: errors.append('A história do Pet é obrigatória.')
@@ -232,56 +227,4 @@ def editar_pet(request, id):
             'choices_tamanho': Pet.choices_tamanho,
         }
         return render(request, 'editar_pet.html', context)
-
-class PetListAPIView(generics.ListAPIView):
-    """
-    API endpoint que permite que os pets sejam listados.
-    Retorna uma lista de todos os pets ativos e disponíveis para adoção.
-    """
-    queryset = Pet.objects.filter(status='P', is_active=True)
-    serializer_class = PetSerializer
-
-    def list(self, request, *args, **kwargs):
-        try:
-            # Tenta executar a lógica padrão da view (listar os pets)
-            return super().list(request, *args, **kwargs)
-        except Exception as e:
-            # Em caso de qualquer erro inesperado (ex: falha no banco),
-            # retorna uma resposta JSON padronizada com status 500.
-            return Response(
-                {"detail": "Ocorreu um erro inesperado no servidor ao tentar listar os pets."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-
-class PetDetailAPIView(APIView):
-    """
-    API endpoint que permite que um único pet seja visualizado.
-    Retorna os detalhes de um pet específico pelo seu ID.
-    """
-    def get(self, request, pk, format=None):
-        try:
-            # Tenta buscar o pet diretamente
-            pet = Pet.objects.get(pk=pk)
-            # Serializa os dados do pet encontrado
-            serializer = PetSerializer(pet)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        
-        except Pet.DoesNotExist:
-            # Se o pet não for encontrado, retorna 404
-            return Response(
-                {"detail": "Pet não encontrado."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        except Exception as e:
-            # Para qualquer outro erro, retorna 500
-            return Response(
-                {"detail": "Ocorreu um erro inesperado no servidor."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-# src/divulgar/views.py (SUBSTITUA A CLASSE PELA FUNÇÃO ABAIXO)
-from rest_framework.decorators import api_view
 

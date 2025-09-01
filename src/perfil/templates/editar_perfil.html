@@ -143,116 +143,123 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
 <script>
+       // ================================================================= //
+    // SCRIPT PARA CARREGAMENTO DINÂMICO DE ESTADOS/CIDADES E PREENCHIMENTO //
+    // ================================================================= //
     $(document).ready(function() {
-        // Carrega a lista de estados do IBGE e ordena alfabeticamente
-        $.ajax({
-            url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados',
-            method: 'GET',
-            success: function(data) {
-                data.sort(function(a, b) {
-                    return a.nome.localeCompare(b.nome);
-                });
-                $.each(data, function(key, estado) {
-                    // Obter o ID do estado do usuário
-                    var estadoId = "{{ user_profile.estado_id }}";
+        // Pega os dados iniciais do perfil renderizados pelo Django
+        const estadoInicialId = "{{ user_profile.estado_id }}";
+        const cidadeInicialNome = "{{ user_profile.cidade_nome }}";
+        const selectEstado = $('#estado');
+        const selectCidade = $('#cidade');
 
-                    // Comparar o ID do estado com o ID do estado atual
-                    if (estado.id === parseInt(estadoId)) {
-                        $('#estado').append($('<option>', {
-                            value: estado.id,
-                            text: estado.nome,
-                            selected: true // Setar o estado como selecionado
-                        }));
-                    } else {
-                        $('#estado').append($('<option>', {
-                            value: estado.id,
-                            text: estado.nome
-                        }));
-                    }
+        // 1. Busca a lista de todos os estados da NOSSA API
+        $.ajax({
+            url: '/api/localidades/estados/', // <-- MUDANÇA AQUI
+            method: 'GET',
+            success: function(estados) {
+                estados.sort((a, b) => a.nome.localeCompare(b.nome));
+                
+                selectEstado.empty().append($('<option>', { value: '', text: 'Selecione o estado...' }));
+                
+                $.each(estados, function(key, estado) {
+                    // Cria a option e já a marca como selecionada se for o estado inicial
+                    const option = $('<option>', {
+                        value: estado.id,
+                        text: estado.nome,
+                        selected: estado.id == estadoInicialId
+                    });
+                    selectEstado.append(option);
                 });
+
+                // 2. Se um estado já estava selecionado, dispara o 'change' para carregar as cidades
+                if (estadoInicialId) {
+                    selectEstado.trigger('change');
+                }
+            },
+            error: function() {
+                console.error("Falha ao carregar os estados da API local.");
             }
         });
 
-        // Ação quando o estado é alterado
-        $('#estado').change(function() {
-            var estadoId = $(this).val();
-            var estadoNome = $(this).find(':selected').text(); 
+        // 3. Ação quando o estado é alterado
+        selectEstado.change(function() {
+            const estadoId = $(this).val();
+            const estadoNome = $(this).find(':selected').text();
+            
+            $('#estado_nome').val(estadoNome);
+
+            selectCidade.empty().append($('<option value="">Carregando cidades...</option>'));
 
             if (estadoId) {
-                // Carrega a lista de cidades com base no estado selecionado
+                // Busca as cidades da NOSSA API
                 $.ajax({
-                    url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + estadoId + '/municipios',
+                    url: `/api/localidades/estados/${estadoId}/cidades/`, // <-- MUDANÇA AQUI
                     method: 'GET',
-                    success: function(data) {
-                        $('#cidade').empty().append($('<option>', {
-                            value: '',
-                            text: 'Selecione a cidade...'
-                        }));
-                        data.sort(function(a, b) {
-                            return a.nome.localeCompare(b.nome);
-                        });
-                        $.each(data, function(key, cidade) {
-                            $('#cidade').append($('<option>', { 
+                    success: function(cidades) {
+                        selectCidade.empty().append($('<option value="">Selecione a cidade...</option>'));
+                        cidades.sort((a, b) => a.nome.localeCompare(b.nome));
+                        
+                        $.each(cidades, function(key, cidade) {
+                            // Cria a option e já a marca como selecionada se for a cidade inicial
+                            const option = $('<option>', {
                                 value: cidade.nome,
                                 text: cidade.nome,
-                                selected: cidade.nome === "{{ user_profile.cidade_nome }}"
-                            }));
+                                selected: cidade.nome === cidadeInicialNome
+                            });
+                            selectCidade.append(option);
                         });
+                    },
+                    error: function() {
+                        selectCidade.empty().append($('<option value="">Falha ao carregar cidades</option>'));
                     }
                 });
             } else {
-                $('#cidade').empty().append($('<option>', {
-                    value: '',
-                    text: 'Selecione a cidade...'
-                }));
+                selectCidade.empty().append($('<option value="">Selecione um estado primeiro</option>'));
             }
-            // Atualiza o valor do estado nome para o campo oculto
-            $('#estado_nome').val(estadoNome); 
+        });
+
+        // 4. Ação quando a cidade é alterada (para o campo hidden)
+        selectCidade.change(function() {
+            const cidadeNome = $(this).val();
+            $('#cidade_nome').val(cidadeNome);
         });
     });
 
-      // Função para pré-visualizar a imagem de perfil
-      function previewImage(event) {
+    // ========================================================== //
+    //        SCRIPTS PARA PREVIEW E REMOÇÃO DE IMAGEM            //
+    // ========================================================== //
+    // (Estas funções permanecem exatamente as mesmas, não precisam de alteração)
+
+    function previewImage(event) {
         const file = event.target.files[0];
         const previewContainer = document.getElementById('imagePreview');
-
-        // Limpa a imagem existente na pré-visualização
         previewContainer.innerHTML = '';
 
         const img = document.createElement('img');
         img.src = URL.createObjectURL(file);
-        img.onload = function() {
-            URL.revokeObjectURL(this.src);
-        };
+        img.onload = function() { URL.revokeObjectURL(this.src); };
 
         const imageBox = document.createElement('div');
         imageBox.classList.add('image-box');
 
-        // Botão de remoção da imagem
         const removeBtn = document.createElement('button');
         removeBtn.innerHTML = '×';
         removeBtn.classList.add('remove-image');
-        removeBtn.onclick = function() {
-            removeImage();
-        };
+        removeBtn.onclick = function() { removeImage(); };
 
         imageBox.appendChild(img);
         imageBox.appendChild(removeBtn);
         previewContainer.appendChild(imageBox);
 
-        // Marca a remoção como falsa ao carregar uma nova imagem
         document.getElementById('remove_foto_perfil').value = 'false';
     }
 
-    // Função para remover a imagem de perfil
     function removeImage() {
         const previewContainer = document.getElementById('imagePreview');
-        previewContainer.innerHTML = ''; // Limpa a pré-visualização
-
-        const inputFile = document.getElementById('foto_perfil');
-        inputFile.value = ''; // Limpa o valor do campo de arquivo
-
-        document.getElementById('remove_foto_perfil').value = 'true'; // Marca a remoção da foto de perfil
+        previewContainer.innerHTML = '';
+        document.getElementById('foto_perfil').value = '';
+        document.getElementById('remove_foto_perfil').value = 'true';
     }
 
     // Função para enviar a atualização de imagem com método PUT
