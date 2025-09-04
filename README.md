@@ -206,9 +206,14 @@ A estrutura do projeto foi organizada para isolar o código-fonte (`src/`) dos a
 
 ---
 
-### 9. Equipe
-- **Nome do Integrante 1:** [Matrícula]
-- **Nome do Integrante 2:** [Matrícula]
-- **Nome do Integrante 3:** [Matrícula]
-- **Nome do Integrante 4:** [Matrícula]
+### 9. Equipe e Papéis
+
+| Nome | Papel |
+| :--- | :--- |
+| José Alves Ferreira Neto | Product Owner / Gestão |
+| Alan Magalhães Barros | Scrum Master |
+| Alisson Rafael Silva de Almeida | Time (Desenvolvimento) |
+| Yuri da Silva Ferreira | Time (Desenvolvimento) |
+| Kairo César Ferreira Cunha | Time (Desenvolvimento / Testes) |
+| Gabriel Nogueira Ibiapina | UX / Documentação |
 ```
