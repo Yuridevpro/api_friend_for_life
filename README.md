@@ -5,6 +5,10 @@ Este repositório contém o código-fonte e a documentação de uma API de servi
 
 ![Status](https://img.shields.io/badge/Status-API%20Funcional-brightgreen) ![Python](https://img.shields.io/badge/Python-3.x-blue) ![Django](https://img.shields.io/badge/Django-4.x-darkgreen) ![DRF](https://img.shields.io/badge/DRF-3.x-red)
 
+ ### **Relação com os Objetivos de Desenvolvimento Sustentável (ODS)**
+
+Este projeto contribui diretamente para o **ODS 11: Cidades e Comunidades Sustentáveis**, especificamente na meta de tornar as cidades mais inclusivas, seguras, resilientes e sustentáveis. Ao facilitar a adoção de animais de rua, a plataforma "A Friend for Life" ajuda a gerenciar a população de animais abandonados, o que é um desafio para a saúde pública e o bem-estar em ambientes urbanos. Uma comunidade que cuida de seus animais é uma comunidade mais humana, coesa e engajada, fortalecendo os laços sociais e promovendo um ambiente urbano mais seguro e acolhedor para todos os seus habitantes.
+
 ### 1. Objetivo do Trabalho
 
 O objetivo é desenvolver uma API que, para funcionar, consome pelo menos duas APIs externas distintas, demonstrando conceitos de integração e orquestração de serviços.
