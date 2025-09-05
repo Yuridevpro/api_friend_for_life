@@ -26,6 +26,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.core.cache import cache 
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
 def cadastro(request):
     if request.user.is_authenticated:
@@ -325,14 +327,31 @@ def criar_senha(request, uidb64, token):
         return redirect('/auth/login')
 
 
-# Views para cidade e estados
-
 class EstadoListAPIView(APIView):
     """
     API endpoint que busca a lista de estados da API do IBGE e a armazena em cache.
     """
+    @extend_schema(
+        summary="Lista todos os estados do Brasil",
+        description="Busca a lista completa de estados da API oficial do IBGE e a armazena em cache por 24 horas para otimizar requisições futuras.",
+        responses={
+            200: {
+                "description": "Lista de estados obtida com sucesso.",
+                # MUDANÇA AQUI: de "examples" para "example"
+                "example": [
+                    {"id": 11, "sigla": "RO", "nome": "Rondônia"},
+                    {"id": 12, "sigla": "AC", "nome": "Acre"},
+                    {"id": 23, "sigla": "CE", "nome": "Ceará"}
+                ]
+            },
+            500: {
+                "description": "Erro interno do servidor ao tentar se comunicar com a API do IBGE.",
+                # MUDANÇA AQUI: de "examples" para "example"
+                "example": {"error": "Falha ao buscar dados do IBGE."}
+            }
+        }
+    )
     def get(self, request, format=None):
-        # Tenta buscar do cache primeiro
         estados_cache = cache.get('lista_estados_ibge')
         if estados_cache:
             return Response(estados_cache)
@@ -341,10 +360,7 @@ class EstadoListAPIView(APIView):
             response = requests.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
             response.raise_for_status()
             estados = response.json()
-            
-            # Salva no cache por 24 horas (86400 segundos)
             cache.set('lista_estados_ibge', estados, timeout=86400)
-            
             return Response(estados, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': 'Falha ao buscar dados do IBGE.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -353,6 +369,29 @@ class CidadeListAPIView(APIView):
     """
     API endpoint que busca a lista de cidades de um estado específico na API do IBGE.
     """
+    @extend_schema(
+        summary="Lista as cidades de um estado específico",
+        description="Busca a lista de municípios (cidades) de um estado, utilizando o ID do estado fornecido na URL, a partir da API do IBGE.",
+        parameters=[
+            OpenApiParameter(name='estado_id', description='O ID do estado (conforme API do IBGE).', required=True, type=OpenApiTypes.INT, location=OpenApiParameter.PATH),
+        ],
+        responses={
+            200: {
+                "description": "Lista de cidades do estado obtida com sucesso.",
+                # MUDANÇA AQUI: de "examples" para "example"
+                "example": [
+                    {"id": 2300101, "nome": "Abaiara"},
+                    {"id": 2304400, "nome": "Fortaleza"},
+                    {"id": 2307304, "nome": "Juazeiro do Norte"}
+                ]
+            },
+            500: {
+                "description": "Erro interno do servidor ao tentar se comunicar com a API do IBGE.",
+                # MUDANÇA AQUI: de "examples" para "example"
+                "example": {"error": "Falha ao buscar dados do IBGE."}
+            }
+        }
+    )
     def get(self, request, estado_id, format=None):
         try:
             response = requests.get(f'https://servicodados.ibge.gov.br/api/v1/localidades/estados/{estado_id}/municipios?orderBy=nome')

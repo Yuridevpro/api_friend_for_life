@@ -20,6 +20,8 @@ from django.contrib.auth import update_session_auth_hash
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 
 @login_required
 def meu_perfil(request):
@@ -368,29 +370,36 @@ class AvatarAPIView(APIView):
     API endpoint que consome a API DiceBear para gerar uma URL de avatar
     com base em um e-mail fornecido.
     """
+    @extend_schema(
+        summary="Gera a URL de um avatar único",
+        description="Consome a API DiceBear para gerar uma URL de uma imagem de avatar (SVG) única e determinística com base no e-mail fornecido.",
+        parameters=[
+            OpenApiParameter(name='email', description='O e-mail que servirá como semente (seed) para a geração do avatar.', required=True, type=OpenApiTypes.STR, location=OpenApiParameter.PATH),
+        ],
+        responses={
+            200: {
+                "description": "URL do avatar gerado com sucesso.",
+                # MUDANÇA AQUI: de "examples" para "example"
+                "example": {"avatar_url": "https://api.dicebear.com/8.x/adventurer/svg?seed=exemplo@email.com"}
+            },
+            400: {
+                "description": "Erro de requisição, geralmente por não fornecer um e-mail.",
+                # MUDANÇA AQUI: de "examples" para "example"
+                "example": {"error": "O e-mail é obrigatório."}
+            }
+        }
+    )
     def get(self, request, email, format=None):
         try:
-            # Validação inicial para garantir que o e-mail não está vazio
             if not email:
                 return Response(
                     {"error": "O e-mail é obrigatório."}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
-            # --- Consumo da API Externa (DiceBear) ---
-            # A "chamada" aqui é apenas a construção da URL, que é inerentemente segura
-            # e não deve lançar exceções de rede.
             avatar_url = f"https://api.dicebear.com/8.x/adventurer/svg?seed={email}"
-            
-            # Retorna a URL em um objeto JSON
             return Response({"avatar_url": avatar_url}, status=status.HTTP_200_OK)
-        
         except Exception as e:
-            # Rede de segurança para qualquer erro inesperado que possa ocorrer
-            # durante o processamento da requisição.
             return Response(
                 {"detail": "Ocorreu um erro inesperado no servidor ao gerar o avatar."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
